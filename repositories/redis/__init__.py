@@ -1,0 +1,3 @@
+REDIS_URI = 'redis://192.168.1.158:6379'
+REDIS_USERNAME = 'redis'
+REDIS_PASSWORD = 'password'
