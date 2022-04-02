@@ -82,7 +82,8 @@ class Die:
     _BLACK_F = "<:blackf:949812873004187759>"
     _BLACK_T = "<:blackt:949812874715463751>"
 
-    def __init__(self, die_type=None, by_alias=True):
+    def __init__(self, die_type: str = None, by_alias: bool = True):
+        die_type = die_type.upper()
         if not by_alias and die_type is not None:
             self.type = die_type
         elif by_alias and die_type is not None:
@@ -134,6 +135,7 @@ class Die:
         elif self.type == self._FFG_SETBACK:
             emoji_gif = self._BLACK_GIF
         self.die_gif = emoji_gif
+        return self.die_gif
 
     def get_faces(self):
         faces = []
@@ -208,6 +210,7 @@ class Die:
             ]
 
         self.die_faces = faces
+        return self
 
     def get_corresponding_die_face(self):
 
@@ -285,6 +288,7 @@ class Die:
                 return self._BLACK_T
             if self.current_value == [self._FAILURE]:
                 return self._BLACK_F
+        return self
 
     def get_type(self):
         return self.type
@@ -305,6 +309,7 @@ class Die:
                 self.score_card["triumphs"] += 1
             elif entry == self._DESPAIR:
                 self.score_card["despairs"] += 1
+        return self
 
     @property
     def DESPAIR(self):

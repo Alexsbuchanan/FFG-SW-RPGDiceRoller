@@ -1,16 +1,22 @@
 import time
 from typing import Optional
 
-import asyncio
+
+import discord
+from discord import Embed, Component, ButtonStyle
 from discord.ext import commands
 from discord.ext.commands.context import Context
+from discord.ui import View, TextInput, Button, Select, Modal, Item
 
+from models.Die import Die
 from repositories.mongo.user_repository import get_or_add_user_from_context, update_user
 from utils import command_parser_util, dice_util
 
-TOKEN = "OTQxODI4OTA5MzI5MTU4MTc4.Ygbohg.tuUARD4LBblHC3EHr9Pmioa42-c"
+TOKEN = "OTQxODI4OTA5MzI5MTU4MTc4.Ygbohg.b3uH05SznDctDuJCeJwKtGl6Nzw"
 
-bot = commands.Bot(command_prefix="!")
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 
 def print_help(command=""):
@@ -34,6 +40,38 @@ async def set_config(ctx: Context, setting: str = "", *args) -> None:
     user = update_user(user)
     await ctx.message.delete()
     await ctx.author.send(f"User setting updated. Set {setting} = {user[setting]}")
+
+
+@bot.command(name="test")
+async def embedded_test(ctx: Context) -> None:
+    # embed: Embed = discord.Embed(title='Test Embed', description='WOW WHAT A TEST')
+    # embed.add_field(name="Success Dice", value=Die('g').get_emoji_gif())
+    # embed.add_field(name="Field 1", value="Not an inline field!", inline=False)
+    # embed.add_field(name="Field 2", value="An inline field!", inline=True)
+    # embed.add_field(name="Field 3", value="Look I'm inline with field 2!", inline=True)
+    view = (
+        View()
+        .add_item(Button(style=ButtonStyle['primary'], emoji="❤️"))
+        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
+        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
+        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
+        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
+        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
+        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
+        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
+    )
+    await ctx.send(view=view)
+    # await ctx.send("I'm outside of this", embed=embed)
+
+
+@bot.event
+async def on_ready():
+    print("Connected!")
+
+
+@bot.event
+async def on_error(ctx: Context):
+    print(ctx)
 
 
 @bot.command(name="roll")
