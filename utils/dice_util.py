@@ -58,25 +58,25 @@ async def calculate_score(dice):
 
 async def generate_score_string(score: dict):
     score_string: str = ""
-    score_string += str(Die('G').SUCCESS) * score["successes"]
-    score_string += str(Die('R').FAILURE) * score["failures"]
+    score_string += str(Die("G").SUCCESS) * score["successes"]
+    score_string += str(Die("R").FAILURE) * score["failures"]
     score_string += str(Die().ADVANTAGE) * score["advantages"]
     score_string += str(Die().THREAT) * score["threats"]
     score_string += str(Die().TRIUMPH) * score["triumphs"]
     score_string += str(Die().DESPAIR) * score["despairs"]
 
     score_string_2: str = ""
-    if score['successes'] > 0:
+    if score["successes"] > 0:
         score_string_2 += f"{score['successes']}{str(Die().SUCCESS)} • "
-    if score['failures'] > 0:
+    if score["failures"] > 0:
         score_string_2 += f"{score['failures']}{str(Die().FAILURE)} • "
-    if score['advantages'] > 0:
+    if score["advantages"] > 0:
         score_string_2 += f"{score['advantages']}{str(Die().ADVANTAGE)} • "
-    if score['threats'] > 0:
+    if score["threats"] > 0:
         score_string_2 += f"{score['threats']}{str(Die().THREAT)} • "
-    if score['triumphs'] > 0:
+    if score["triumphs"] > 0:
         score_string_2 += f"{score['triumphs']}{str(Die().TRIUMPH)} • "
-    if score['despairs'] > 0:
+    if score["despairs"] > 0:
         score_string_2 += f"{score['despairs']}{str(Die().DESPAIR)}"
 
     score_string_2 = score_string_2.rsplit("• ", maxsplit=1)[0]
@@ -106,14 +106,20 @@ async def get_dice_from_emoji_string(emoji_string):
     blue = Die()._BLUE_GIF
     purple = Die()._PURPLE_GIF
 
-    _, num_green = re.subn(green, '', emoji_string)
-    _, num_red = re.subn(red, '', emoji_string)
-    _, num_yellow = re.subn(yellow, '', emoji_string)
-    _, num_black = re.subn(black, '', emoji_string)
-    _, num_blue = re.subn(blue, '', emoji_string)
-    _, num_purple = re.subn(purple, '', emoji_string)
+    _, num_green = re.subn(green, "", emoji_string)
+    _, num_red = re.subn(red, "", emoji_string)
+    _, num_yellow = re.subn(yellow, "", emoji_string)
+    _, num_black = re.subn(black, "", emoji_string)
+    _, num_blue = re.subn(blue, "", emoji_string)
+    _, num_purple = re.subn(purple, "", emoji_string)
 
-    roll_string = ([f'G{num_green}'] + [f'R{num_red}'] + [f'Y{num_yellow}']
-                   + [f'BL{num_black}'] + [f'B{num_blue}'] + [f'P{num_purple}'])
+    roll_string = (
+        [f"G{num_green}"]
+        + [f"R{num_red}"]
+        + [f"Y{num_yellow}"]
+        + [f"BL{num_black}"]
+        + [f"B{num_blue}"]
+        + [f"P{num_purple}"]
+    )
     dice = await create_dice(roll_string)
     return dice

@@ -11,10 +11,15 @@ from pymongo.results import InsertOneResult
 
 def repository(func: ()):
     def _wrapper(*args, **kwargs):
-        with pymongo.MongoClient(os.getenv('DB_URI').format(os.getenv('DB_USER_2'), os.getenv('DB_PASSWORD_2'))) as client:
+        with pymongo.MongoClient(
+            os.getenv("DB_URI").format(
+                os.getenv("DB_USER_2"), os.getenv("DB_PASSWORD_2")
+            )
+        ) as client:
             db: pymongo = client.DiscordBots.swrpgbot
             response = func(db, *args, **kwargs)
         return response
+
     return _wrapper
 
 

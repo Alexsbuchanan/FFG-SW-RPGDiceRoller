@@ -3,15 +3,10 @@ import time
 from typing import Optional
 
 import discord
-from discord import ButtonStyle
-from discord.components import SelectOption
-from discord.ext import commands
 from discord.ext.commands.context import Context
-from discord.ui import View, Button, Select
 from dotenv import load_dotenv
 from discord.ext import commands
 
-from models.Die import Die
 from models.DiceSelect import EphemeralRoller
 from repositories.mongo.user_repository import get_or_add_user_from_context, update_user
 from utils import command_parser_util, dice_util
@@ -43,12 +38,14 @@ async def on_error(ctx: Context):
 
 @bot.command(name="set-config")
 async def set_config(ctx: Context, setting: str = "", *args) -> None:
-    value = ' '.join(args)
+    value = " ".join(args)
     user = get_or_add_user_from_context(ctx)
-    if setting not in ['rpname']:
+    if setting not in ["rpname"]:
         await ctx.message.delete()
-        await ctx.author.send(f"{setting} is not a valid setting, only rpname "
-                              f"is for now. You stinkin' womp rat! ❤️ <:Big_Chungus:949041751719550996>")
+        await ctx.author.send(
+            f"{setting} is not a valid setting, only rpname "
+            f"is for now. You stinkin' womp rat! ❤️ <:Big_Chungus:949041751719550996>"
+        )
         return
     user[setting] = value
     user = update_user(user)
@@ -66,7 +63,7 @@ async def testing_general(ctx: Context) -> None:
 
 @bot.command(name="roll")
 async def roll(
-        ctx: Context, dice_config: Optional[str] = "", roll_tag: Optional[str] = None
+    ctx: Context, dice_config: Optional[str] = "", roll_tag: Optional[str] = None
 ) -> None:
     user = get_or_add_user_from_context(ctx)
     parsed_command = await command_parser_util.parse_roll(ctx, dice_config)
@@ -93,8 +90,10 @@ async def roll(
     roll_string = await dice_util.generate_roll_string(dice)
     await message.edit(content=roll_string)
 
-    response = f"Rolled By: " \
-               f"{user['rpname'] if 'rpname' in user.keys() and user['rpname'] is not None else ctx.author.name}\n"
+    response = (
+        f"Rolled By: "
+        f"{user['rpname'] if 'rpname' in user.keys() and user['rpname'] is not None else ctx.author.name}\n"
+    )
     if roll_tag is not None:
         response += f"Rolled for: {roll_tag}\n"
     # response += roll_string + "\n"
@@ -113,7 +112,7 @@ async def roll(
 
 @bot.command(name="rollp")
 async def roll_private(
-        ctx: Context, dice_config: Optional[str] = "", roll_tag: Optional[str] = None
+    ctx: Context, dice_config: Optional[str] = "", roll_tag: Optional[str] = None
 ) -> None:
     await ctx.message.delete()
     user = get_or_add_user_from_context(ctx)
