@@ -10,6 +10,7 @@ class Die:
     _FFG_DIFFICULTY = "FFG_Difficulty"
     _FFG_PROFICIENCY = "FFG_Proficiency"
     _FFG_SETBACK = "FFG_Setback"
+    _FFG_FORCE = "FFG_Force"
 
     # Color alias constants
     _COLOR_ALIAS_ABILITY = "G"
@@ -83,7 +84,8 @@ class Die:
     _BLACK_T = "<:blackt:949812874715463751>"
 
     def __init__(self, die_type: str = None, by_alias: bool = True):
-        die_type = die_type.upper()
+        if die_type is not None:
+            die_type = die_type.upper()
         if not by_alias and die_type is not None:
             self.type = die_type
         elif by_alias and die_type is not None:
@@ -105,6 +107,22 @@ class Die:
             "triumphs": 0,
             "despairs": 0,
         }
+
+    def get_die_name(self):
+        if self.type == self._FFG_ABILITY:
+            return self._FFG_ABILITY[4:]
+        elif self.type == self._FFG_BOOST:
+            return self._FFG_BOOST[4:]
+        elif self.type == self._FFG_SETBACK:
+            return self._FFG_SETBACK[4:]
+        elif self.type == self._FFG_CHALLENGE:
+            return self._FFG_CHALLENGE[4:]
+        elif self.type == self._FFG_DIFFICULTY:
+            return self._FFG_DIFFICULTY[4:]
+        elif self.type == self._FFG_FORCE:
+            return self._FFG_FORCE[4:]
+        elif self.type == self._FFG_PROFICIENCY:
+            return self._FFG_PROFICIENCY[4:]
 
     def set_dice_type_by_color_alias(self, color_alias: str):
         if color_alias == self._COLOR_ALIAS_ABILITY:
@@ -310,6 +328,30 @@ class Die:
             elif entry == self._DESPAIR:
                 self.score_card["despairs"] += 1
         return self
+
+    @property
+    def GREEN_(self):
+        return self._GREEN_
+
+    @property
+    def RED_(self):
+        return self._RED_
+
+    @property
+    def PURPLE_(self):
+        return self._PURPLE_
+
+    @property
+    def BLACK_(self):
+        return self._BLACK_
+
+    @property
+    def YELLOW_(self):
+        return self._YELLOW_
+
+    @property
+    def BLUE_(self):
+        return self._BLUE_
 
     @property
     def DESPAIR(self):

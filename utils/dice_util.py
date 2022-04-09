@@ -58,8 +58,8 @@ async def calculate_score(dice):
 
 async def generate_score_string(score: dict):
     score_string: str = ""
-    score_string += str(Die().SUCCESS) * score["successes"]
-    score_string += str(Die().FAILURE) * score["failures"]
+    score_string += str(Die('G').SUCCESS) * score["successes"]
+    score_string += str(Die('R').FAILURE) * score["failures"]
     score_string += str(Die().ADVANTAGE) * score["advantages"]
     score_string += str(Die().THREAT) * score["threats"]
     score_string += str(Die().TRIUMPH) * score["triumphs"]
@@ -96,3 +96,24 @@ async def generate_roll_string(dice):
     for die in dice:
         roll_string += die.get_corresponding_die_face()
     return roll_string
+
+
+async def get_dice_from_emoji_string(emoji_string):
+    green = Die()._GREEN_GIF
+    red = Die()._RED_GIF
+    yellow = Die()._YELLOW_GIF
+    black = Die()._BLACK_GIF
+    blue = Die()._BLUE_GIF
+    purple = Die()._PURPLE_GIF
+
+    _, num_green = re.subn(green, '', emoji_string)
+    _, num_red = re.subn(red, '', emoji_string)
+    _, num_yellow = re.subn(yellow, '', emoji_string)
+    _, num_black = re.subn(black, '', emoji_string)
+    _, num_blue = re.subn(blue, '', emoji_string)
+    _, num_purple = re.subn(purple, '', emoji_string)
+
+    roll_string = ([f'G{num_green}'] + [f'R{num_red}'] + [f'Y{num_yellow}']
+                   + [f'BL{num_black}'] + [f'B{num_blue}'] + [f'P{num_purple}'])
+    dice = await create_dice(roll_string)
+    return dice

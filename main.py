@@ -1,22 +1,26 @@
+import os
 import time
 from typing import Optional
 
-
 import discord
-from discord import Embed, Component, ButtonStyle
+from discord import ButtonStyle
+from discord.components import SelectOption
 from discord.ext import commands
 from discord.ext.commands.context import Context
-from discord.ui import View, TextInput, Button, Select, Modal, Item
+from discord.ui import View, Button, Select
+from dotenv import load_dotenv
+from discord.ext import commands
 
 from models.Die import Die
+from models.DiceSelect import EphemeralRoller
 from repositories.mongo.user_repository import get_or_add_user_from_context, update_user
 from utils import command_parser_util, dice_util
 
-TOKEN = "OTQxODI4OTA5MzI5MTU4MTc4.Ygbohg.b3uH05SznDctDuJCeJwKtGl6Nzw"
+load_dotenv()
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"), intents=intents)
 
 
 def print_help(command=""):
@@ -25,6 +29,16 @@ def print_help(command=""):
             f"Type the number of dice, and the letter afterwords to specify which dice you're rolling \n"
             f"For example: !roll 1g1y2p will roll 1 green, 1 yellow, and 2 purple."
         )
+
+
+@bot.event
+async def on_ready():
+    print("Connected!")
+
+
+@bot.event
+async def on_error(ctx: Context):
+    print(ctx)
 
 
 @bot.command(name="set-config")
@@ -43,35 +57,11 @@ async def set_config(ctx: Context, setting: str = "", *args) -> None:
 
 
 @bot.command(name="test")
-async def embedded_test(ctx: Context) -> None:
-    # embed: Embed = discord.Embed(title='Test Embed', description='WOW WHAT A TEST')
-    # embed.add_field(name="Success Dice", value=Die('g').get_emoji_gif())
-    # embed.add_field(name="Field 1", value="Not an inline field!", inline=False)
-    # embed.add_field(name="Field 2", value="An inline field!", inline=True)
-    # embed.add_field(name="Field 3", value="Look I'm inline with field 2!", inline=True)
-    view = (
-        View()
-        .add_item(Button(style=ButtonStyle['primary'], emoji="❤️"))
-        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
-        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
-        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
-        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
-        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
-        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
-        .add_item(Button(style=ButtonStyle['primary'], emoji="💩"))
-    )
-    await ctx.send(view=view)
-    # await ctx.send("I'm outside of this", embed=embed)
-
-
-@bot.event
-async def on_ready():
-    print("Connected!")
-
-
-@bot.event
-async def on_error(ctx: Context):
-    print(ctx)
+async def testing_general(ctx: Context) -> None:
+    user = get_or_add_user_from_context(ctx)
+    view = EphemeralRoller(user, ctx)
+    await ctx.message.delete()
+    await ctx.send(view=view, delete_after=10)
 
 
 @bot.command(name="roll")
@@ -103,7 +93,8 @@ async def roll(
     roll_string = await dice_util.generate_roll_string(dice)
     await message.edit(content=roll_string)
 
-    response = f"Rolled By: {user['rpname'] if 'rpname' in user.keys() and user['rpname'] is not None else ctx.author.name}\n"
+    response = f"Rolled By: " \
+               f"{user['rpname'] if 'rpname' in user.keys() and user['rpname'] is not None else ctx.author.name}\n"
     if roll_tag is not None:
         response += f"Rolled for: {roll_tag}\n"
     # response += roll_string + "\n"
@@ -163,4 +154,4 @@ async def roll_private(
     return
 
 
-bot.run(TOKEN)
+bot.run(os.getenv("TOKEN"))

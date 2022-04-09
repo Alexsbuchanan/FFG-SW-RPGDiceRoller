@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 from configparser import ConfigParser
 import pymongo
@@ -7,18 +8,10 @@ from pymongo.collection import Collection
 from pymongo.cursor import Cursor
 from pymongo.results import InsertOneResult
 
-config = ConfigParser()
-
-config.read("secrets/secrets.cfg")
-
-db_user = config["Default"]["DB_USER_2"]
-db_password = config["Default"]["DB_PASSWORD_2"]
-db_uri = config["Default"]["DB_URI"]
-
 
 def repository(func: ()):
     def _wrapper(*args, **kwargs):
-        with pymongo.MongoClient(db_uri.format(db_user, db_password)) as client:
+        with pymongo.MongoClient(os.getenv('DB_URI').format(os.getenv('DB_USER_2'), os.getenv('DB_PASSWORD_2'))) as client:
             db: pymongo = client.DiscordBots.swrpgbot
             response = func(db, *args, **kwargs)
         return response
