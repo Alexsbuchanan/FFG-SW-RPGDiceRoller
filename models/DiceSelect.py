@@ -17,27 +17,6 @@ from utils.dice_util import (
 )
 
 
-class DiceNumberEntry(discord.ui.TextInput):
-    def __init__(self, num: int):
-        super().__init__(
-            label="Number of Dice",
-            style=discord.TextStyle.short,
-            placeholder="Num Dice",
-            required=True,
-            row=num,
-        )
-
-    # async def callback(self, interaction: Interaction) -> Any:
-    #     view = self.view
-    #     current_state: discord.ui.Select = view.children[0]
-    #     die_to_fill = Die(current_state.values[0]).get_emoji_gif()
-    #     content = interaction.message.content
-    #     content = re.sub(die_to_fill, '', content)
-    #
-    #     await interaction.response.edit_message(
-    #         content=content, view=view)
-
-
 class DiceSubmitButton(discord.ui.Button):
     def __init__(self, num: int):
         super().__init__(
@@ -127,7 +106,7 @@ class DiceSelectDropDown(discord.ui.View):
             .add_item(DiceDecrementButton(1))
             .add_item(DiceIncrementButton(1))
             .add_item(DiceSubmitButton(3))
-            .add_item(DiceNumberEntry(4))
+            # .add_item(DiceNumberEntry(4))
         )
 
     async def roll_dice(self, roll_value):
