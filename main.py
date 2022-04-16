@@ -53,15 +53,14 @@ async def set_config(ctx: Context, setting: str = "", *args) -> None:
     await ctx.author.send(f"User setting updated. Set {setting} = {user[setting]}")
 
 
-@bot.command(name="test")
+@bot.command(name="roll")
 async def testing_general(ctx: Context) -> None:
     user = get_or_add_user_from_context(ctx)
     view = EphemeralRoller(user, ctx)
-    await ctx.message.delete()
     await ctx.send(view=view, delete_after=10)
 
 
-@bot.command(name="roll")
+@bot.command(name="rollt")
 async def roll(
     ctx: Context, dice_config: Optional[str] = "", roll_tag: Optional[str] = None
 ) -> None:

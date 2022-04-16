@@ -25,9 +25,8 @@ class DiceSubmitButton(discord.ui.Button):
 
     async def callback(self, interaction: Interaction) -> Any:
         view = self.view
+        await interaction.response.edit_message(content="Done Rolling", view=view.clear_items(), )
         await view.roll_dice(interaction.message.content)
-        self.disabled = True
-        await interaction.response.edit_message(view=view.clear_items())
 
 
 class DiceIncrementButton(discord.ui.Button):
@@ -70,7 +69,7 @@ class DiceSelectDropDownOption(discord.ui.Select):
             discord.SelectOption(label="Boost", value="B", emoji=Die().BLUE_),
             discord.SelectOption(label="Setback", value="BL", emoji=Die().BLACK_),
             discord.SelectOption(label="Proficiency", value="Y", emoji=Die().YELLOW_),
-            discord.SelectOption(label="Force", value="W", emoji=Die().GREEN_),
+            discord.SelectOption(label="Force", value="W", emoji=Die().WHITE_),
             discord.SelectOption(label="Challenge", value="R", emoji=Die().RED_),
             discord.SelectOption(label="Difficulty", value="P", emoji=Die().PURPLE_),
         ]
@@ -96,17 +95,16 @@ class DiceSelectDropDownOption(discord.ui.Select):
 class DiceSelectDropDown(discord.ui.View):
     children: List[Union[DiceSelectDropDownOption, None]]
 
-    def __init__(self, ctx: Context, timeout=None):
+    def __init__(self, ctx: Context, roll_label=None, timeout=None):
         super().__init__(timeout=timeout)
-
+        self.roll_label = roll_label
         self.count = 0
         self.ctx: Context = ctx
         (
             self.add_item(DiceSelectDropDownOption(0))
-            .add_item(DiceDecrementButton(1))
-            .add_item(DiceIncrementButton(1))
-            .add_item(DiceSubmitButton(3))
-            # .add_item(DiceNumberEntry(4))
+                .add_item(DiceDecrementButton(1))
+                .add_item(DiceIncrementButton(1))
+                .add_item(DiceSubmitButton(3))
         )
 
     async def roll_dice(self, roll_value):
@@ -122,7 +120,11 @@ class DiceSelectDropDown(discord.ui.View):
             tmp_response = f"Rolled By: {user['author'].name}"
         tmp_response += roll_string + "\n"
 
-        message = await self.ctx.send(roll_string)
+        if len(roll_string) == 0:
+            await self.ctx.author.send("Choose the dice before you roll doofus. Try again.")
+            return
+
+        message = await self.ctx.send(roll_string, reference=self.ctx.message)
 
         time.sleep(1)
 
@@ -133,6 +135,12 @@ class DiceSelectDropDown(discord.ui.View):
             f"Rolled By: "
             f"{user['rpname'] if 'rpname' in user.keys() and user['rpname'] is not None else self.ctx.author.name}\n"
         )
+
+        if len(self.roll_label) > 0:
+            response += (
+                f"Rolled for: {self.roll_label} \n"
+            )
+
         response += f"Condensed: {score_string_2}"
 
         if len(response) > 2000:
@@ -140,7 +148,7 @@ class DiceSelectDropDown(discord.ui.View):
                 "This dice roll too big yo. I'll figure it out soon doe. TY ❤️ <:Big_Chungus:949041751719550996>",
             )
         else:
-            await self.ctx.send(response)
+            await self.ctx.send(response, reference=self.ctx.message)
 
 
 class EphemeralRoller(discord.ui.View):
@@ -152,9 +160,32 @@ class EphemeralRoller(discord.ui.View):
 
     @discord.ui.button(label=f"Choose your dice", style=discord.ButtonStyle.blurple)
     async def receive(
-        self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        await interaction.response.send_message(
-            view=DiceSelectDropDown(self.ctx), ephemeral=True
+        await interaction.response.send_modal(
+            RollTypeModal(self.ctx)
         )
-        await interaction.message.delete()
+
+
+class RollTypeModal(discord.ui.Modal):
+    def __init__(self, ctx):
+        super().__init__(title="Roll Label")
+        self.ctx = ctx
+
+    # This will be a short input, where the user can enter their name
+    # It will also have a placeholder, as denoted by the `placeholder` kwarg.
+    # By default, it is required and is a short-style input which is exactly
+    # what we want.
+    name = discord.ui.TextInput(
+        label='Rolling For',
+        placeholder='What you\'re rolling for here...',
+        required=False
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.send_message(
+            view=DiceSelectDropDown(self.ctx, self.name.value), ephemeral=True
+        )
+
+    async def on_error(self, error: Exception, interaction: discord.Interaction) -> None:
+        await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)

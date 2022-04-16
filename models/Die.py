@@ -19,6 +19,7 @@ class Die:
     _COLOR_ALIAS_DIFFICULTY = "P"
     _COLOR_ALIAS_PROFICIENCY = "Y"
     _COLOR_ALIAS_SETBACK = "BL"
+    _COLOR_ALIAS_FORCE = "W"
 
     # Dice Face Emojis
     _SUCCESS = "<:success:949480296967991387>"
@@ -27,6 +28,8 @@ class Die:
     _THREAT = "<:threat:949480297437757440>"
     _TRIUMPH = "<:triumph:949480297412571176>"
     _DESPAIR = "<:despair:949480296787628073>"
+    _LIGHTSIDE_PIP = "<:lightpip:964893476040892446>"
+    _DARKSIDE_PIP = "<:darkpip:964893464544301096>"
 
     # Dice Emojis
     _IMG_ABILITY_DIE = "<:abilitydie:949480296519180289>"
@@ -42,6 +45,7 @@ class Die:
     _BLUE_GIF = "<a:bluegif:949812876808421407>"
     _YELLOW_GIF = "<a:yellowgif:949812877479542865>"
     _BLACK_GIF = "<a:blackgif:949812873478160425>"
+    _WHITE_GIF = "<a:whitegif:964893411838668858>"
 
     _PURPLE_T = "<:purplet:949812877282410547>"
     _PURPLE_TT = "<:purplett:949812876984602644>"
@@ -83,6 +87,12 @@ class Die:
     _BLACK_F = "<:blackf:949812873004187759>"
     _BLACK_T = "<:blackt:949812874715463751>"
 
+    _WHITE_ = "<:white:964901095207997451>"
+    _WHITE_NN = "<:whitenn:964893398114922556>"
+    _WHITE_N = "<:whiten:964893397900996721>"
+    _WHITE_L = "<:whitel:964893398072975360>"
+    _WHITE_LL = "<:whitell:964893398085558362>"
+
     def __init__(self, die_type: str = None, by_alias: bool = True):
         if die_type is not None:
             die_type = die_type.upper()
@@ -106,6 +116,8 @@ class Die:
             "threats": 0,
             "triumphs": 0,
             "despairs": 0,
+            "light_sides": 0,
+            "dark_sides": 0,
         }
 
     def get_die_name(self):
@@ -123,6 +135,8 @@ class Die:
             return self._FFG_FORCE[4:]
         elif self.type == self._FFG_PROFICIENCY:
             return self._FFG_PROFICIENCY[4:]
+        elif self.type == self._FFG_FORCE:
+            return self._FFG_FORCE[4:]
 
     def set_dice_type_by_color_alias(self, color_alias: str):
         if color_alias == self._COLOR_ALIAS_ABILITY:
@@ -137,6 +151,8 @@ class Die:
             self.type = self._FFG_PROFICIENCY
         elif color_alias == self._COLOR_ALIAS_DIFFICULTY:
             self.type = self._FFG_DIFFICULTY
+        elif color_alias == self._COLOR_ALIAS_FORCE:
+            self.type = self._FFG_FORCE
 
     def get_emoji_gif(self):
         emoji_gif = None
@@ -152,6 +168,9 @@ class Die:
             emoji_gif = self._YELLOW_GIF
         elif self.type == self._FFG_SETBACK:
             emoji_gif = self._BLACK_GIF
+        elif self.type == self._FFG_FORCE:
+            emoji_gif = self._WHITE_GIF
+
         self.die_gif = emoji_gif
         return self.die_gif
 
@@ -226,6 +245,21 @@ class Die:
                 [self._FAILURE],
                 [self._FAILURE],
             ]
+        elif self.type == self._FFG_FORCE:
+            faces = [
+                [self._DARKSIDE_PIP, self._DARKSIDE_PIP],
+                [self._LIGHTSIDE_PIP, self._LIGHTSIDE_PIP],
+                [self._LIGHTSIDE_PIP, self._LIGHTSIDE_PIP],
+                [self._LIGHTSIDE_PIP, self._LIGHTSIDE_PIP],
+                [self._LIGHTSIDE_PIP],
+                [self._LIGHTSIDE_PIP],
+                [self._DARKSIDE_PIP],
+                [self._DARKSIDE_PIP],
+                [self._DARKSIDE_PIP],
+                [self._DARKSIDE_PIP],
+                [self._DARKSIDE_PIP],
+                [self._DARKSIDE_PIP],
+            ]
 
         self.die_faces = faces
         return self
@@ -246,66 +280,75 @@ class Die:
         elif self.type == self._FFG_ABILITY:
             if self.current_value == [None]:
                 return self._GREEN_
-            if self.current_value == [self._SUCCESS]:
+            elif self.current_value == [self._SUCCESS]:
                 return self._GREEN_S
-            if self.current_value == [self._ADVANTAGE]:
+            elif self.current_value == [self._ADVANTAGE]:
                 return self._GREEN_A
-            if self.current_value == [self._ADVANTAGE, self._SUCCESS]:
+            elif self.current_value == [self._ADVANTAGE, self._SUCCESS]:
                 return self._GREEN_SA
-            if self.current_value == [self._ADVANTAGE, self._ADVANTAGE]:
+            elif self.current_value == [self._ADVANTAGE, self._ADVANTAGE]:
                 return self._GREEN_AA
-            if self.current_value == [self._SUCCESS, self._SUCCESS]:
+            elif self.current_value == [self._SUCCESS, self._SUCCESS]:
                 return self._GREEN_SS
         elif self.type == self._FFG_CHALLENGE:
             if self.current_value == [None]:
                 return self._RED_
-            if self.current_value == [self._DESPAIR]:
+            elif self.current_value == [self._DESPAIR]:
                 return self._RED_D
-            if self.current_value == [self._FAILURE]:
+            elif self.current_value == [self._FAILURE]:
                 return self._RED_F
-            if self.current_value == [self._THREAT]:
+            elif self.current_value == [self._THREAT]:
                 return self._RED_T
-            if self.current_value == [self._FAILURE, self._FAILURE]:
+            elif self.current_value == [self._FAILURE, self._FAILURE]:
                 return self._RED_FF
-            if self.current_value == [self._THREAT, self._THREAT]:
+            elif self.current_value == [self._THREAT, self._THREAT]:
                 return self._RED_TT
-            if self.current_value == [self._THREAT, self._FAILURE]:
+            elif self.current_value == [self._THREAT, self._FAILURE]:
                 return self._RED_FT
         elif self.type == self._FFG_DIFFICULTY:
             if self.current_value == [None]:
                 return self._PURPLE_
-            if self.current_value == [self._FAILURE]:
+            elif self.current_value == [self._FAILURE]:
                 return self._PURPLE_F
-            if self.current_value == [self._THREAT]:
+            elif self.current_value == [self._THREAT]:
                 return self._PURPLE_T
-            if self.current_value == [self._FAILURE, self._FAILURE]:
+            elif self.current_value == [self._FAILURE, self._FAILURE]:
                 return self._PURPLE_FF
-            if self.current_value == [self._THREAT, self._FAILURE]:
+            elif self.current_value == [self._THREAT, self._FAILURE]:
                 return self._PURPLE_FT
-            if self.current_value == [self._THREAT, self._THREAT]:
+            elif self.current_value == [self._THREAT, self._THREAT]:
                 return self._PURPLE_TT
         elif self.type == self._FFG_PROFICIENCY:
             if self.current_value == [None]:
                 return self._YELLOW_
-            if self.current_value == [self._TRIUMPH]:
+            elif self.current_value == [self._TRIUMPH]:
                 return self._YELLOW_R
-            if self.current_value == [self._SUCCESS]:
+            elif self.current_value == [self._SUCCESS]:
                 return self._YELLOW_S
-            if self.current_value == [self._ADVANTAGE]:
+            elif self.current_value == [self._ADVANTAGE]:
                 return self._YELLOW_A
-            if self.current_value == [self._ADVANTAGE, self._SUCCESS]:
+            elif self.current_value == [self._ADVANTAGE, self._SUCCESS]:
                 return self._YELLOW_SA
-            if self.current_value == [self._SUCCESS, self._SUCCESS]:
+            elif self.current_value == [self._SUCCESS, self._SUCCESS]:
                 return self._YELLOW_SS
-            if self.current_value == [self._ADVANTAGE, self._ADVANTAGE]:
+            elif self.current_value == [self._ADVANTAGE, self._ADVANTAGE]:
                 return self._YELLOW_AA
         elif self.type == self._FFG_SETBACK:
             if self.current_value == [None]:
                 return self._BLACK_
-            if self.current_value == [self._THREAT]:
+            elif self.current_value == [self._THREAT]:
                 return self._BLACK_T
-            if self.current_value == [self._FAILURE]:
+            elif self.current_value == [self._FAILURE]:
                 return self._BLACK_F
+        elif self.type == self._FFG_FORCE:
+            if self.current_value == [self._DARKSIDE_PIP]:
+                return self._WHITE_N
+            elif self.current_value == [self._DARKSIDE_PIP, self._DARKSIDE_PIP]:
+                return self._WHITE_NN
+            elif self.current_value == [self._LIGHTSIDE_PIP]:
+                return self._WHITE_L
+            elif self.current_value == [self._LIGHTSIDE_PIP, self._LIGHTSIDE_PIP]:
+                return self._WHITE_LL
         return self
 
     def get_type(self):
@@ -327,6 +370,10 @@ class Die:
                 self.score_card["triumphs"] += 1
             elif entry == self._DESPAIR:
                 self.score_card["despairs"] += 1
+            elif entry == self._LIGHTSIDE_PIP:
+                self.score_card["light_sides"] += 1
+            elif entry == self._DARKSIDE_PIP:
+                self.score_card["dark_sides"] += 1
         return self
 
     @property
@@ -354,6 +401,10 @@ class Die:
         return self._BLUE_
 
     @property
+    def WHITE_(self):
+        return self._WHITE_
+
+    @property
     def DESPAIR(self):
         return self._DESPAIR
 
@@ -376,3 +427,11 @@ class Die:
     @property
     def SUCCESS(self):
         return self._SUCCESS
+
+    @property
+    def LIGHTSIDE(self):
+        return self._LIGHTSIDE_PIP
+
+    @property
+    def DARKSIDE(self):
+        return self._DARKSIDE_PIP
