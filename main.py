@@ -1,13 +1,16 @@
 import os
 import time
+from io import BytesIO
 from typing import Optional
 
 import discord
 from discord.ext.commands.context import Context
 from dotenv import load_dotenv
 from discord.ext import commands
+import pdfkit
 
 from models.DiceSelect import EphemeralRoller
+from models.Die import Die
 from repositories.mongo.user_repository import get_or_add_user_from_context, update_user
 from utils import command_parser_util, dice_util
 
@@ -53,15 +56,33 @@ async def set_config(ctx: Context, setting: str = "", *args) -> None:
     await ctx.author.send(f"User setting updated. Set {setting} = {user[setting]}")
 
 
+@bot.command(name="test")
+async def test(ctx: Context) -> None:
+    user = get_or_add_user_from_context(ctx)
+
+    pdf_example = pdfkit.from_string("""<html>
+             <head>
+             </head>
+             <body>
+               <h1>Hello World<h1>
+             </body>
+            </html>""", options={'encoding': 'utf-8'})
+
+    my_file = discord.File(fp=BytesIO(pdf_example))
+
+    await ctx.send(file=my_file)
+
+
 @bot.command(name="roll")
-async def testing_general(ctx: Context) -> None:
+async def roll_visual(ctx: Context) -> None:
     user = get_or_add_user_from_context(ctx)
     view = EphemeralRoller(user, ctx)
-    await ctx.send(view=view, delete_after=10)
+    if view is not None:
+        await ctx.send(view=view, delete_after=10)
 
 
 @bot.command(name="rollt")
-async def roll(
+async def roll_text(
     ctx: Context, dice_config: Optional[str] = "", roll_tag: Optional[str] = None
 ) -> None:
     user = get_or_add_user_from_context(ctx)

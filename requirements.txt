@@ -16,3 +16,4 @@ yarl==1.7.2
 git+https://github.com/Rapptz/discord.py
 pymongo[srv]~=4.0.2
 python-dotenv~=0.20.0
+pdfkit~=1.0.0

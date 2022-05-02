@@ -4,6 +4,7 @@ import re
 import discord
 from discord import Interaction, InteractionResponse
 from discord.ext.commands import Context
+from discord.ui import Button
 
 from models.Die import Die
 from repositories.mongo.user_repository import get_or_add_user_from_context
@@ -151,22 +152,6 @@ class DiceSelectDropDown(discord.ui.View):
             await self.ctx.send(response, reference=self.ctx.message)
 
 
-class EphemeralRoller(discord.ui.View):
-    def __init__(self, user, ctx):
-        super().__init__()
-        self.user = user
-        self.ctx = ctx
-        self.username = self.user["rpname"] if "rpname" in self.user.keys() else ""
-
-    @discord.ui.button(label=f"Choose your dice", style=discord.ButtonStyle.blurple)
-    async def receive(
-            self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
-        await interaction.response.send_modal(
-            RollTypeModal(self.ctx)
-        )
-
-
 class RollTypeModal(discord.ui.Modal):
     def __init__(self, ctx):
         super().__init__(title="Roll Label")
@@ -189,3 +174,32 @@ class RollTypeModal(discord.ui.Modal):
 
     async def on_error(self, error: Exception, interaction: discord.Interaction) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
+
+
+class DiceRollingButton(discord.ui.Button):
+
+    def __init__(self, user: dict, ctx):
+        self.user = user
+        self.ctx = ctx
+        super().__init__(
+            style=discord.ButtonStyle.blurple, label=f"Choose your dice {self.user['name']}", disabled=False
+        )
+
+    async def callback(self, interaction: Interaction) -> Any:
+        if interaction.user.id != self.user['id']:
+            return None
+        await interaction.response.send_modal(
+            RollTypeModal(self.ctx)
+        )
+
+
+class EphemeralRoller(discord.ui.View):
+    def __init__(self, user, ctx):
+        super().__init__()
+        self.user = user
+        self.ctx = ctx
+        self.username = self.user["rpname"] if "rpname" in self.user.keys() else ""
+
+        self.dice_select_button = DiceRollingButton(self.user, self.ctx)
+
+        self.add_item(self.dice_select_button)
