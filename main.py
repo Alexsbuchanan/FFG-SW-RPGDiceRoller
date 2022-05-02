@@ -7,7 +7,7 @@ import discord
 from discord.ext.commands.context import Context
 from dotenv import load_dotenv
 from discord.ext import commands
-import pdfkit
+# import pdfkit
 
 from models.DiceSelect import EphemeralRoller
 from models.Die import Die
